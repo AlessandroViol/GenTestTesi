@@ -7,10 +7,10 @@ from tqdm import tqdm
 from Generator import Generator, QwenGenerator
 
 
-def makeFiles(prompt: dict, content: str, thinking_content:str, time):
-    os.makedirs(os.path.join("DatiTesi", prompt["path"]), exist_ok=True)
+def makeFiles(prompt: dict, content: str, thinking_content:str, time, model):
+    os.makedirs(os.path.join("DatiTesi", model, prompt["path"]), exist_ok=True)
     with open(
-        os.path.join("DatiTesi", prompt["path"], f"{prompt["instruction"]}_log.txt"),
+        os.path.join("DatiTesi", model, prompt["path"], f"{prompt["instruction"]}_log.txt"),
         "w",
         encoding="utf-8",
     ) as f:
@@ -26,22 +26,22 @@ def makeFiles(prompt: dict, content: str, thinking_content:str, time):
         filename = str(prompt["instruction"]) + "_" + code.split("\n", 1)[0].split("/")[-1].split("\\")[-1].removesuffix(".cs").replace(":", "")
 
         try:
-            path = os.path.join("DatiTesi", prompt["path"], f"{filename}.cs") 
+            path = os.path.join("DatiTesi", model, prompt["path"], f"{filename}.cs") 
 
             while os.path.exists(path):
                 filename += "Dup"
-                path = os.path.join("DatiTesi", prompt["path"], f"{filename}.cs") 
+                path = os.path.join("DatiTesi", model, prompt["path"], f"{filename}.cs") 
 
             with open(path, "w", encoding="utf-8") as f:
                 f.write(code)
 
         except OSError as s:
             filename = str(prompt["instruction"]) + "_UnnamedFile" 
-            path = os.path.join("DatiTesi", prompt["path"], f"{filename}.cs") 
+            path = os.path.join("DatiTesi", model, prompt["path"], f"{filename}.cs") 
 
             while os.path.exists(path):
                 filename += "Dup"
-                path = os.path.join("DatiTesi", prompt["path"], f"{filename}.cs") 
+                path = os.path.join("DatiTesi", model, prompt["path"], f"{filename}.cs") 
 
             with open(path, "w", encoding="utf-8") as f:
                 f.write(code)
@@ -60,7 +60,7 @@ def processBatch(generator: Generator, prompts: dict, batch_size: int, enable_th
                 thinking_content = None
 
             content = answer["content"]
-            makeFiles(prompts[prompt_key], content, thinking_content, answer["time"])
+            makeFiles(prompts[prompt_key], content, thinking_content, answer["time"], model = generator._model_ref)
 
 
 def processSequential(generator: Generator, prompts: dict, enable_thinking: bool):
@@ -76,5 +76,5 @@ def processSequential(generator: Generator, prompts: dict, enable_thinking: bool
 
         content = answer["content"]
 
-        makeFiles(prompt, content, thinking_content, answer["time"])
+        makeFiles(prompt, content, thinking_content, answer["time"], model = generator._model_ref)
 

@@ -47,7 +47,7 @@ def makeFiles(prompt: dict, content: str, thinking_content:str, time, model):
                 f.write(code)
 
 
-def processBatch(generator: Generator, prompts: dict, batch_size: int, enable_thinking: bool):
+def processBatch(generator: Generator, prompts: dict, batch_size: int, enable_thinking: bool, name):
     prompt_keys = list(prompts.keys())
     for batch in tqdm([prompt_keys[i : i + batch_size] for i in range(0, len(prompt_keys), batch_size)]):
         batch_prompts=[prompts[dict_key]["prompt"] for dict_key in batch]
@@ -60,10 +60,10 @@ def processBatch(generator: Generator, prompts: dict, batch_size: int, enable_th
                 thinking_content = None
 
             content = answer["content"]
-            makeFiles(prompts[prompt_key], content, thinking_content, answer["time"], model = generator._model_ref)
+            makeFiles(prompts[prompt_key], content, thinking_content, answer["time"], name)
 
 
-def processSequential(generator: Generator, prompts: dict, enable_thinking: bool):
+def processSequential(generator: Generator, prompts: dict, enable_thinking: bool, name):
     for dict_key in tqdm(prompts.keys()):
         prompt = prompts[dict_key]
 
@@ -76,5 +76,5 @@ def processSequential(generator: Generator, prompts: dict, enable_thinking: bool
 
         content = answer["content"]
 
-        makeFiles(prompt, content, thinking_content, answer["time"], model = generator._model_ref)
+        makeFiles(prompt, content, thinking_content, answer["time"], name)
 

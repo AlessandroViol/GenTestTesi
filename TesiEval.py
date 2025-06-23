@@ -2,6 +2,8 @@ import json
 import os
 import re
 
+from tqdm import tqdm
+
 from Generator import Generator, QwenGenerator
 
 
@@ -47,7 +49,7 @@ def makeFiles(prompt: dict, content: str, thinking_content:str, time):
 
 def processBatch(generator: Generator, prompts: dict, batch_size: int, enable_thinking: bool):
     prompt_keys = list(prompts.keys())
-    for batch in [prompt_keys[i : i + batch_size] for i in range(0, len(prompt_keys), batch_size)]:
+    for batch in tqdm([prompt_keys[i : i + batch_size] for i in range(0, len(prompt_keys), batch_size)]):
         batch_prompts=[prompts[dict_key]["prompt"] for dict_key in batch]
         answers = generator.batchGenerate(batch_prompts, enable_thinking)
 
@@ -62,7 +64,7 @@ def processBatch(generator: Generator, prompts: dict, batch_size: int, enable_th
 
 
 def processSequential(generator: Generator, prompts: dict, enable_thinking: bool):
-    for dict_key in prompts.keys():
+    for dict_key in tqdm(prompts.keys()):
         prompt = prompts[dict_key]
 
         answer = generator.generate(prompt["prompt"], enable_thinking)
